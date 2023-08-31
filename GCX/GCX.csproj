@@ -8,13 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="PureCloudPlatform.Client.V2" Version="182.0.0" />
+    <PackageReference Include="PureCloudPlatform.Client.V2" Version="184.2.0" />
     <PackageReference Include="System.Text.Json" Version="7.0.3" />
   </ItemGroup>
 
   <ItemGroup>
     <Using Include="PureCloudPlatform.Client.V2">
-      <Static>True</Static>
+      <Static>False</Static>
     </Using>
   </ItemGroup>
 

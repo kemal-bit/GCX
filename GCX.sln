@@ -5,7 +5,11 @@ VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GCX", "GCX\GCX.csproj", "{3A31994B-81EC-40D9-8531-6CD1D2C4CD26}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TMCloud", "TMCloud\TMCloud.csproj", "{0DD234BD-2F59-4431-8FC4-734EB4E30408}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TMCloud", "TMCloud\TMCloud.csproj", "{0DD234BD-2F59-4431-8FC4-734EB4E30408}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TMCloudAPI", "TMCloudAPI\TMCloudAPI.csproj", "{7B0368D6-88A7-4DB3-9D1C-9B847304840B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudTest", "CloudTest\CloudTest.csproj", "{AF2968F0-1ED8-429D-B9E2-A66C37016F12}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{0DD234BD-2F59-4431-8FC4-734EB4E30408}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0DD234BD-2F59-4431-8FC4-734EB4E30408}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0DD234BD-2F59-4431-8FC4-734EB4E30408}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B0368D6-88A7-4DB3-9D1C-9B847304840B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B0368D6-88A7-4DB3-9D1C-9B847304840B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B0368D6-88A7-4DB3-9D1C-9B847304840B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B0368D6-88A7-4DB3-9D1C-9B847304840B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF2968F0-1ED8-429D-B9E2-A66C37016F12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF2968F0-1ED8-429D-B9E2-A66C37016F12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF2968F0-1ED8-429D-B9E2-A66C37016F12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF2968F0-1ED8-429D-B9E2-A66C37016F12}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

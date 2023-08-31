@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html>
+<!--
+    Demo to illustrate fetching Genesys Cloud data and the showInteractionDetails(...) SDK method
+
+    Note:  Although this example is hosted with the others here on github; it won't work without
+      configuring an OAuth Client and hosting it elsewhere. See js code below for details.
+
+    Reminder: This example is using CDNs and simple javascript to illustrate the SDK. Both the
+      Genesys Cloud SDK and Apps SDK can be obtained via npm and support many build tools
+      and javascript libraries to fit within your development environment.
+-->
+<head>
+    <meta charset="utf-8">
+    <title>Genesys Cloud client-app-sdk Interactions Demo</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" integrity="sha384-aUGj/X2zp5rLCbBxumKTCw2Z50WgIr1vs/PFN4praOTvYXWlVyh2UtNUU0KAUhAX" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ"
+          crossorigin="anonymous">
+    <script src="https://sdk-cdn.mypurecloud.com/javascript/157.0.0/purecloud-platform-client-v2.min.js"></script>
+    <script src="https://sdk-cdn.mypurecloud.com/client-apps/2.6.3/purecloud-client-app-sdk-de77761d.min.js"></script>
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+    <script src="Scripts/moment.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+    <style>
+        body {
+            font-family: Arial;
+        }
+
+        .warningBorder {
+            border: solid;
+            border-width: 3px;
+            border-color: orange;
+            padding: 2px;
+            color: orange;
+        }
+
+        Style the tab
+        .tab {
+            overflow: hidden;
+            border: 1px solid #ccc;
+            background-color: #f1f1f1;
+        }
+
+        Style the buttons inside the tab
+        .tab button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+            font-size: 17px;
+        }
+
+        Change background color of buttons on hover
+        .tab button:hover {
+            background-color: #ddd;
+        }
+
+        Create an active/current tablink class
+        .tab button.active {
+            background-color: #ccc;
+        }
+
+        Style the tab content
+        .tabcontent {
+            display: none;
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+            border-top: none;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-areas: 'header1 header2 header2 header3' 'menu  main main right' 'menu  main main rightMenu' 'menu  main main rightMenu' 'menu footer footer footer2';
+            grid-gap: 3px;
+            height: 600px;
+            width: 800px;
+        }
+
+        .grid-container2 {
+            display: grid;
+            grid-template-areas: 'headerx headery';
+        }
+
+        .gridRight {
+            grid-area: header3;
+            height: 20px;
+            margin: 10px;
+            width: 200px;
+        }
+
+        .gridRightMenu {
+            grid-area: right;
+            margin: 10px;
+            padding: 10px;
+            align-content: flex-start;
+        }
+
+        .gridHeader2 {
+            grid-area: header2;
+            margin: 10px;
+        }
+
+        .gridHeader {
+            grid-area: header1;
+            margin: 10px;
+        }
+
+        .gridHeaderx {
+            grid-area: headerx;
+            margin: 10px;
+            align-content: flex-start;
+        }
+
+        .gridHeadery {
+            grid-area: headery;
+            margin: 10px;
+            align-content: flex-start;
+        }
+
+        .gridMenu {
+            grid-area: menu;
+            margin: 10px;
+            padding: 5px;
+            border: solid;
+            border-width: 3px;
+        }
+
+        .gridMain {
+            grid-area: main;
+            align-content: flex-start;
+        }
+
+
+
+        .gridFooter {
+            grid-area: footer;
+        }
+
+        .workgroups {
+        }
+
+        .users {
+        }
+    </style>
+    <!-- <script src="oauth.js"></script> -->
+
+
+</head>
+<body>
+    <div class="grid-container">
+
+        <div class="gridHeader">
+
+            <div class="grid-container2">
+                <div class="gridHeaderx ui-widget">
+                    Address : <select id="directCall" class="ui-widget">
+                        <option value="0800342340">Also Emmen</option>
+                        <option value="0844222539">Cablex</option>
+
+                    </select>
+
+                </div>
+
+                <div class="gridHeadery ui-widget">
+                    <button id="directCallButton" class="ui-button ui-widget ui-corner-all">Call</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="gridRight">
+            <div>
+                <label for="severTime">Server Time:</label> <input disabled="disabled" type="text" id="serverTime" />
+            </div>
+            <div>
+                <button id="version" onclick="pop();">1.0.0.0</button>
+            </div>
+        </div>
+
+        <div class="gridRightMenu">
+            <input type="checkbox" id="userCheck" />
+            <label for="userCheck">Users</label>
+
+            <br />
+            <input type="checkbox" checked="checked" id="workCheck" value="workgroups" />
+            <label for="workCheck">workgroups</label>
+
+            <div id="border" class="warningBorder">
+                <p id="msg">No Available Agent For Selected Workgroup</p>
+            </div>
+        </div>
+        <div class="gridHeader2">
+
+            <label for="filter"> Filter</label>
+            <input type="text" id="filter" placeholder="type to filter" />
+        </div>
+
+        <div class="gridMenu">
+            <div>
+                <label for="workgrp">Workgroup: </label>
+                <strong id="workgrp"> </strong>
+            </div>
+
+            <div>
+                <label for="Id">Id: </label>
+                <strong id="Id"></strong>
+            </div>
+
+            <div>
+                <label for="userId">User: </label>
+                <strong id="userId"></strong>
+            </div>
+
+            <div>
+                <label for="state">State: </label>
+                <strong id="state"></strong>
+            </div>
+
+            <div>
+                <label for="station">Station: </label>
+                <strong id="station"></strong>
+            </div>
+            <div>
+                <label for="remoteId">Phone Number: </label>
+                <strong id="remoteId"></strong>
+            </div>
+        </div>
+
+        <div class="gridMain">
+
+
+            <select id="callWorkgroups" size="5" class="ui-widget">
+            </select>
+
+        </div>
+        <div id="footer" class="gridFooter">
+            <div class="grid-container2">
+                <div class="gridHeaderx ui-widget">
+                    <button id="transfer" class="ui-button ui-widget ui-corner-all" onclick="transfer()">Call</button>
+
+
+                </div>
+
+                <div class="gridHeadery ui-widget">
+                    <button id="consult" class="ui-button ui-widget ui-corner-all">Consult Transfer</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div id="versionDialog" style="display:none">
+
+        <p> <strong>version 1.0.0.0</strong> Initial version</p>
+
+        <input id="buff" type="text" hidden />
+    </div>
+
+
+    <script>
+
+        debugger;
+        document.addEventListener('DOMContentLoaded', function () {
+            // This client ID expects the redirect URL to be http://localhost:8080/
+
+            //'mypurecloud.ie': 'e58247ba-04a0-4b51-8c20-517490cb3a8a'};
+            const clientId = '01808976-fc9d-401a-b1cd-da342f9e45e4';
+            //const redirectUri = 'http://localhost/TMCloud/ConversationNotification.html';
+
+            const { origin, protocol, host, pathname } = window.location;
+            const redirectUrl = 'http://localhost/TMCloud/TmCloud.html';
+
+            // Set Genesys Cloud objects
+            const platformClient = require('platformClient');
+            const client = platformClient.ApiClient.instance;
+            const conversationsApi = new platformClient.ConversationsApi();
+            const notificationsApi = new platformClient.NotificationsApi();
+            const usersApi = new platformClient.UsersApi();
+
+            // Set Genesys Cloud settings
+            client.setEnvironment('mypurecloud.ie');
+            client.setPersistSettings(true, 'test_app');
+
+            // Set local vars
+
+
+            let conversationList = {};
+            let me, webSocket, conversationsTopic, notificationChannel;
+
+
+            // Set up handlebars
+
+
+            // jQuery calls this when the DOM is available
+            $(document).ready(() => {
+
+                //$('#border').hide();
+
+                $("#Transfer").button();
+                $('#border').hide();
+
+
+
+
+                var hg = $("#callWorkgroups").closest('.gridMain').height();
+
+                $("#callWorkgroups").height(400);
+                $("#callWorkgroups").width(250);
+
+
+
+                $("#versionDialog").dialog({
+                    position: {
+                        my: "center",
+                        at: "center",
+                        of: window
+                    },
+                    modal: true,
+                    autoOpen: false,
+                    show: {
+                        effect: "blind",
+                        duration: 1000
+                    },
+                    hide: {
+                        effect: "explode",
+                        duration: 1000
+                    }
+                });
+                //$("#versionDialog").dialog('option', 'position', 'center');
+
+                // Authenticate with Genesys Cloud
+                client.loginImplicitGrant(clientId, redirectUrl)
+                    .then(() => {
+                        console.log('Logged in');
+
+
+                        // Get authenticated user's info
+                        return usersApi.getUsersMe();
+                    })
+                    .then((userMe) => {
+                        console.log('userMe: ', userMe);
+                        me = userMe;
+
+
+                        // Create notification channel
+                        return notificationsApi.postNotificationsChannels();
+                    })
+                    .then((channel) => {
+                        console.log('channel: ', channel);
+                        notificationChannel = channel;
+
+
+                        // Set up web socket
+                        webSocket = new WebSocket(notificationChannel.connectUri);
+                        webSocket.onmessage = handleNotification;
+
+                        // Subscribe to authenticated user's conversations
+                        conversationsTopic = 'v2.users.' + me.id + '.conversations';
+                        const body = [{ id: conversationsTopic }];
+                        return notificationsApi.putNotificationsChannelSubscriptions(notificationChannel.id, body);
+
+                    })
+
+
+                    .catch((err) => console.error(err));
+            });
+
+            // Handle incoming Genesys Cloud notification from WebSocket
+            function handleNotification(message) {
+                // Parse notification string to a JSON object
+                const notification = JSON.parse(message.data);
+
+                // Discard unwanted notifications
+                if (notification.topicName.toLowerCase() === 'channel.metadata') {
+                    // Heartbeat
+                    console.info('Ignoring metadata: ', notification);
+                    return;
+                } else if (notification.topicName.toLowerCase() !== conversationsTopic.toLowerCase()) {
+                    // Unexpected topic
+                    console.warn('Unknown notification: ', notification);
+                    return;
+                } else {
+                    console.debug('Conversation notification: ', notification);
+                }
+
+                // See function description for explanation
+                copyCallPropsToParticipant(notification.eventBody);
+
+                // Update conversation in list or remove it if disconnected
+                if (isConversationDisconnected(notification.eventBody))
+                    delete conversationList[notification.eventBody.id];
+                else {
+                    conversationList[notification.eventBody.id] = notification.eventBody;
+                    var queues = GetQueues(notification.eventBody.participants[0].queueId);
+
+                    $('#callWorkgroups').find('option').remove().end();
+
+
+
+                    $.each(queues, function (index, value) {
+
+                        //listBox.append("<option/>").val(value.Name).text(value.DisplayName);
+                        var option = new Option(value, value);
+                        $(option).addClass(".workgroups");
+                        $('#callWorkgroups').append($(option));
+
+
+                    });
+                }
+
+            }
+
+
+            /* This function copies properties from the participant's call object in a notification to the
+             * participant object to make the participant object look the same as the response from the
+             * conversations APIs. This isn't strictly necessary, but is helpful to maintain a consistent structure.
+             */
+            function copyCallPropsToParticipant(conversation) {
+                conversation.participants.forEach((participant) => {
+                    if (!participant.calls || participant.calls.length === 0) return;
+
+                    participant.ani = participant.calls[0].self.addressNormalized;
+                    participant.attributes = participant.additionalProperties;
+                    participant.confined = participant.calls[0].confined;
+                    participant.direction = participant.calls[0].direction;
+                    participant.dnis = participant.calls[0].other.addressNormalized;
+                    participant.held = participant.calls[0].held;
+                    participant.muted = participant.calls[0].muted;
+                    participant.provider = participant.calls[0].provider;
+                    participant.recording = participant.calls[0].recording;
+                    participant.recordingState = participant.calls[0].recordingState;
+                    participant.state = participant.calls[0].state;
+                    if (participant.userId)
+                        participant.user = { id: participant.userId, selfUri: `/api/v2/users/${participant.userId}` };
+                    if (participant.calls[0].peerId)
+                        participant.peer = participant.calls[0].peerId;
+                });
+            }
+
+            // Determines if a conversation is disconnected by checking to see if all participants are disconnected
+            function isConversationDisconnected(conversation) {
+                let isConnected = false;
+                conversation.participants.some((participant) => {
+                    if (participant.state !== 'disconnected') {
+                        isConnected = true;
+                        return true;
+                    }
+                });
+
+                return !isConnected;
+            }
+
+            // Mute participant
+            function mute(callId, participantId, currentMuteState) {
+                // Create request body, only set desired properties
+                let body = {
+                    'muted': !currentMuteState
+                };
+
+                // Invoke API
+                conversationsApi.patchConversationsCallParticipant(callId, participantId, body)
+                    .then(() => {
+                        // Result will be empty here
+                    }).catch((err) => console.error(err));
+            }
+
+            // Hold participant
+            function hold(callId, participantId, currentHoldState) {
+                // Create request body, only set desired properties
+                let body = {
+                    'held': !currentHoldState
+                };
+
+                // Invoke API
+                conversationsApi.patchConversationsCallParticipant(callId, participantId, body)
+                    .then(() => {
+                        // Result will be empty here
+                    }).catch((err) => console.error(err));
+            }
+
+
+            // Disconnect participant
+            function disconnect(callId, participantId) {
+                // Create request body, only set desired properties
+                let body = {
+                    'state': 'disconnected'
+                };
+
+                // Invoke API
+                conversationsApi.patchConversationsCallParticipant(callId, participantId, body)
+                    .then(() => {
+                        // Result will be empty here
+                    }).catch((err) => console.error(err));
+            }
+
+
+            // Initiate a consult transfer
+            function startConsult() {
+                console.debug(conversationList);
+                let callId = conversationList[Object.keys(conversationList)[0]].id;
+
+                // Grab the first participant, which should be the party we dialed for an outbound call
+                let participantId = conversationList[callId].participants[1].id;
+
+                // Create request body
+                let body = {
+                    'speakTo': 'destination',
+                    'destination': {
+                        'address': $('input#newparticipant').val()
+                    }
+                };
+
+                // Invoke API
+                conversationsApi.postConversationsCallParticipantConsult(callId, participantId, body)
+                    .then(() => {
+                        $('input#newparticipant').val('');
+                        // We can ignore the response in this guide.
+                    }).catch((err) => console.error(err));
+            }
+
+
+            // Change which parties in the consult transfer are speaking
+            function consultSpeakTo(speakTo) {
+                let callId = conversationList[Object.keys(conversationList)[0]].id;
+
+                //grab the first participant, which should be the party we dialed for an outbound call
+                let participantId = conversationList[callId].participants[1].id;
+
+                // Create request body
+                let body = {
+                    'speakTo': speakTo
+                };
+
+                // Invoke API
+                conversationsApi.patchConversationsCallParticipantConsult(callId, participantId, body)
+                    .then(() => {
+                        // We can ignore the response in this guide.
+                    }).catch((err) => console.error(err));
+            }
+
+
+            var GetQueues = function (id) {
+                var retval;
+                $.ajax({
+                    url: 'http://localhost/TMCloud/Core/api/TM/' + id,
+
+                    dataType: "json",
+                    contentType: "application/json",
+                    async: false,
+                    success: function (data) {
+                        retval = data;
+                    },
+                    error: function (error) {
+                        console.error(error);
+                    }
+                });
+                return retval;
+            }
+
+
+        });
+    </script>
+</body>
+</html>

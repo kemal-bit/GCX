@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="PureCloudPlatform.Client.V2" Version="184.2.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
   </ItemGroup>
 
 </Project>
